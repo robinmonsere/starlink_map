@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapbox World View</title>
+    <!-- Mapbox GL JS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; }
+        #map { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<!-- Mapbox GL JS Script -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+<script>
+    // Add your Mapbox access token
+    mapboxgl.accessToken = 'pk.eyJ1IjoiYnBhY2h1Y2EiLCJhIjoiY2lxbGNwaXdmMDAweGZxbmg5OGx2YWo5aSJ9.zda7KLJF3TH84UU6OhW16w';
+
+    // Create a new map instance
+    const map = new mapboxgl.Map({
+        container: 'map', // ID of the map container
+        style: 'mapbox://styles/mapbox/dark-v10', // Style of the map
+        center: [0, 0], // Starting position [lng, lat]
+        zoom: 1 // Initial zoom level
+    });
+
+    map.on('load', function() {
+        console.log(map.getStyle().layers); // Log all layers to the console
+      //  map.setStyle('mapbox://styles/mapbox/dark-v10');
+
+        // Remove all text labels (hiding label layers)
+        map.getStyle().layers.forEach(function (layer) {
+            if (layer.id === 'water' || layer.id === 'land' || layer.id === 'admin-0-boundary' || layer.id  === 'land-structure-line' ) {
+                console.log(layer.id); // Log layer ID to the console
+            } else {
+                map.removeLayer(layer.id); // Remove label layers
+            }
+        });
+
+       // map.setPaintProperty('water', 'fill-color', '#191a1a'); // Black water
+        map.setPaintProperty('land', 'background-color', '#191a1a'); // Black land
+
+        console.log(map.getStyle().layers); // Log all layers to the console
+
+        // Add a GeoJSON source for countries
+        map.addSource('countries', {
+            'type': 'geojson',
+            //'data': './countries.geojson.txt'
+            'data': 'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson' // Countries dataset
+        });
+
+        map.addSource('countries_2', {
+            'type': 'geojson',
+            'data': 'world-administrative-boundaries.geojson' // Countries dataset
+        });
+
+        // Add a layer for the countries, all in the same shade of blue
+        map.addLayer({
+            'id': 'countries-layer',
+            'type': 'fill',
+            'source': 'countries',
+            //'source-layer': 'country_boundaries',
+            'paint': {
+                'fill-color': '#4a90e2', // Shade of blue for countries
+                'fill-outline-color': '#000000' // Black border
+            }
+        });
+
+        map.addLayer({
+            'id': 'countries-layer-2',
+            'type': 'fill',
+            'source': 'countries_2',
+            'paint': {
+                'fill-color': '#590c23', // Shade of blue for countries
+                'fill-outline-color': '#000000' // Black border
+            }
+        });
+
+    });
+</script>
+</body>
+</html>
